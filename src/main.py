@@ -20,7 +20,6 @@ def get_data_from_range(state):
     print("GENERATING HIST DATA")
     print(state.start_date)
     state.data = get_stock_data(state.selected_stock, state.start_date, state.end_date)
-    state.show_part_1 = True
 
 def generate_forecast_data(data, n_years):
     print("FORECASTING")
@@ -40,89 +39,82 @@ def forecast_display(state):
     state.forecast = generate_forecast_data(state.data, state.n_years)
 
 
-### Getting the data, make initial forcast and build a front end web-app with Taipy GUI
+#### Getting the data, make initial forcast and build a front end web-app with Taipy GUI
 data = get_stock_data(selected_stock, start_date, end_date)
 forecast = generate_forecast_data(data, n_years)
 
-show_part_1 = True
-show_part_2 = True
 show_dialog = False
 
 page = """
-<center><h1>Stock Price Analysis Dashboard with Taipy</h1></center>
+<|toggle|theme|>
+<|part|class_name=container|
+# Stock Price **Analysis**{: .color_primary} Dashboard
 
-<|layout|columns=1 2 2|
+<|layout|columns=1 2 1|gap=40px|class_name=card p2|
 
-<|
-##Choose the period
-###FROM:   
+<dates|
+#### Selected **Period**{: .color_primary}
+
+From:
 <|{start_date}|date|>  
-###TO:   
-<|{end_date}|date|>  
-|>
 
-<|
-##Please enter a valid ticker:  
-<center>
-<|{selected_stock}|input|>  
-</center>
-##Popular tickers:
-<center>
-<|{selected_stock}|toggle|lov=MSFT;GOOG;AAPL; AMZN; META; COIN; GME; AMC;PYPL|>
-</center>
-|>
+To:
+<|{end_date}|date|> 
 
-<|
-##Select a prediction method
+<|ENTER|button|on_action=get_data_from_range|>
+|dates>
+
+<ticker|
+#### Selected **Ticker**{: .color_primary}
+
+Please enter a valid ticker: 
+<|{selected_stock}|input|label=Stock|> 
+
+or choose a popular one
+
+<|{selected_stock}|toggle|lov=MSFT;GOOG;AAPL; AMZN; META; COIN; AMC; PYPL|>
+|ticker>
+
+<years|
+#### Prediction **years**{: .color_primary}
 Select number of prediction years: <|{n_years}|>  
 <|{n_years}|slider|min=1|max=5|>  
-|>
-|>
 
-
-<|ENTER|button|on_action=get_data_from_range|>  
-<|Show dialog|button|on_action={lambda state: state.assign("show_dialog", True)}|>
-
-
-<|layout|columns=1 1|
-<|
-<|part|render={show_part_1}|partial={partial_A}|>
-
-|>
-
-<|
 <|PREDICT|button|on_action=forecast_display|>
-<|part|render={show_part_2}|partial={partial_B}|>
+|years>
+
 |>
-|>
 
 
-<|Historical Data|expandable|expanded=False|partial={partial_A}|>
-<|{show_dialog}|dialog|width=80%|partial={partial_A}|on_action={lambda state: state.assign("show_dialog", False)}|>
-<|FORECAST Data|expandable|expanded=False|partial={partial_B}|>
-"""
-
-p1 = """
-##Historical closing price
-<|{data}|chart|mode=line|x=Date|y[1]=Open|y[2]=Close|>
-
-##Historical daily trading volume
-<|{data}|chart|mode=line|x=Date|y=Volume|>
-
-##Here is the historical data of the stock: <|{selected_stock}|>
-<|{data}|table|width=80%|>
-"""
-
-p2 = """
-##FORECAST DATA 
+### **Forecast**{: .color_primary} Data
 <|{forecast}|chart|mode=line|x=ds|y[1]=yhat_lower|y[2]=yhat_upper|>
 
-<|{forecast}|table|width=80%|>
+<|Historical Data|expandable|expanded=False|
+<|layout|columns=1 1|
+<|
+### Historical **closing**{: .color_primary} price
+<|{data}|chart|mode=line|x=Date|y[1]=Open|y[2]=Close||>
+|>
+
+<|
+### Historical **daily**{: .color_primary} trading volume
+<|{data}|chart|mode=line|x=Date|y=Volume||>
+|>
+|>
+
+### **Whole**{: .color_primary} historical data: <|{selected_stock}|>
+<|{data}|table|width=100%|>
+|>
+
+
+<|Forecast Data|expandable|expanded=False|
+<|{forecast}|table|width=100%|>
+|>
+|>
 """
+
 
 # Run Taipy GUI
 gui = Gui(page)
-partial_A = gui.add_partial(p1)
-partial_B = gui.add_partial(p2)
 
 gui.run(dark_mode=False)
