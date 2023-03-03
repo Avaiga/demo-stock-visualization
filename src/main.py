@@ -1,4 +1,4 @@
-from taipy import Gui
+from taipy.gui import Gui, notify
 from datetime import date
 import yfinance as yf
 from prophet import Prophet
@@ -20,6 +20,8 @@ def get_data_from_range(state):
     print("GENERATING HIST DATA")
     print(state.start_date)
     state.data = get_stock_data(state.selected_stock, state.start_date, state.end_date)
+    notify(state, 's', 'Historical data has been updated!')
+
 
 def generate_forecast_data(data, n_years):
     print("FORECASTING")
@@ -36,7 +38,10 @@ def generate_forecast_data(data, n_years):
 
 
 def forecast_display(state):
+    notify(state, 'i', 'Predicting...')
     state.forecast = generate_forecast_data(state.data, state.n_years)
+    notify(state, 's', 'Prediction done! Forecast data has been updated!')
+
 
 
 #### Getting the data, make initial forcast and build a front end web-app with Taipy GUI
@@ -45,7 +50,10 @@ forecast = generate_forecast_data(data, n_years)
 
 show_dialog = False
 
-page = """
+partial_md = "<|{forecast}|table|width=100%|>"
+dialog_md = "<|{show_dialog}|dialog|partial={partial}|title=Forecast Data|on_action={lambda state: state.assign('show_dialog', False)}|>"
+
+page = dialog_md + """
 <|toggle|theme|>
 <|part|class_name=container|
 # Stock Price **Analysis**{: .color_primary} Dashboard
@@ -61,7 +69,8 @@ From:
 To:
 <|{end_date}|date|> 
 
-<|ENTER|button|on_action=get_data_from_range|>
+<br/>
+<|Update period and ticker|button|on_action=get_data_from_range|>
 |dates>
 
 <ticker|
@@ -86,9 +95,6 @@ Select number of prediction years: <|{n_years}|>
 |>
 
 
-### **Forecast**{: .color_primary} Data
-<|{forecast}|chart|mode=line|x=ds|y[1]=yhat_lower|y[2]=yhat_upper|>
-
 <|Historical Data|expandable|expanded=False|
 <|layout|columns=1 1|
 <|
@@ -104,17 +110,24 @@ Select number of prediction years: <|{n_years}|>
 
 ### **Whole**{: .color_primary} historical data: <|{selected_stock}|>
 <|{data}|table|width=100%|>
+
+<br/>
 |>
 
 
-<|Forecast Data|expandable|expanded=False|
-<|{forecast}|table|width=100%|>
-|>
+### **Forecast**{: .color_primary} Data
+<|{forecast}|chart|mode=line|x=ds|y[1]=yhat_lower|y[2]=yhat_upper|>
+
+<br/>
+
+<center>
+<|More info|button|on_action={lambda s: s.assign("show_dialog", True)}|>
+</center>
 |>
 """
 
 
 # Run Taipy GUI
 gui = Gui(page)
-
+partial = gui.add_partial(partial_md)
 gui.run(dark_mode=False)
