@@ -4,6 +4,7 @@
 ```
 git clone https://github.com/Avaiga/demo-stock-visualization.git
 cd demo-stock-visualization
+cd src
 pip install -r requirements.txt
 ```
 
