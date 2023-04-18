@@ -53,15 +53,14 @@ show_dialog = False
 partial_md = "<|{forecast}|table|width=100%|>"
 dialog_md = "<|{show_dialog}|dialog|partial={partial}|title=Forecast Data|on_action={lambda state: state.assign('show_dialog', False)}|>"
 
-page = dialog_md + """
-<|toggle|theme|>
-<|part|class_name=container|
-# Stock Price **Analysis**{: .color_primary} Dashboard
+page = dialog_md + """<|toggle|theme|>
+<|container|
+# Stock Price **Analysis**{: .color-primary} Dashboard
 
 <|layout|columns=1 2 1|gap=40px|class_name=card p2|
 
 <dates|
-#### Selected **Period**{: .color_primary}
+#### Selected **Period**{: .color-primary}
 
 From:
 <|{start_date}|date|>  
@@ -74,7 +73,7 @@ To:
 |dates>
 
 <ticker|
-#### Selected **Ticker**{: .color_primary}
+#### Selected **Ticker**{: .color-primary}
 
 Please enter a valid ticker: 
 <|{selected_stock}|input|label=Stock|> 
@@ -85,7 +84,7 @@ or choose a popular one
 |ticker>
 
 <years|
-#### Prediction **years**{: .color_primary}
+#### Prediction **years**{: .color-primary}
 Select number of prediction years: <|{n_years}|>  
 <|{n_years}|slider|min=1|max=5|>  
 
@@ -98,31 +97,31 @@ Select number of prediction years: <|{n_years}|>
 <|Historical Data|expandable|expanded=False|
 <|layout|columns=1 1|
 <|
-### Historical **closing**{: .color_primary} price
-<|{data}|chart|mode=line|x=Date|y[1]=Open|y[2]=Close||>
+### Historical **closing**{: .color-primary} price
+<|{data}|chart|mode=line|x=Date|y[1]=Open|y[2]=Close|>
 |>
 
 <|
-### Historical **daily**{: .color_primary} trading volume
+### Historical **daily**{: .color-primary} trading volume
 <|{data}|chart|mode=line|x=Date|y=Volume||>
 |>
 |>
 
-### **Whole**{: .color_primary} historical data: <|{selected_stock}|>
+### **Whole**{: .color-primary} historical data: <|{selected_stock}|>
 <|{data}|table|width=100%|>
 
 <br/>
 |>
 
 
-### **Forecast**{: .color_primary} Data
+### **Forecast**{: .color-primary} Data
 <|{forecast}|chart|mode=line|x=ds|y[1]=yhat_lower|y[2]=yhat_upper|>
 
 <br/>
 
-<center>
+
 <|More info|button|on_action={lambda s: s.assign("show_dialog", True)}|>
-</center>
+{: .text-center}
 |>
 """
 
@@ -130,4 +129,4 @@ Select number of prediction years: <|{n_years}|>
 # Run Taipy GUI
 gui = Gui(page)
 partial = gui.add_partial(partial_md)
-gui.run(dark_mode=False)
+gui.run(dark_mode=False, port=5005)
