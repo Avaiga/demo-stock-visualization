@@ -1,4 +1,4 @@
-from taipy import Gui
+from taipy.gui import Gui, notify
 from datetime import date
 import yfinance as yf
 from prophet import Prophet
@@ -20,7 +20,8 @@ def get_data_from_range(state):
     print("GENERATING HIST DATA")
     print(state.start_date)
     state.data = get_stock_data(state.selected_stock, state.start_date, state.end_date)
-    state.show_part_1 = True
+    notify(state, 's', 'Historical data has been updated!')
+
 
 def generate_forecast_data(data, n_years):
     print("FORECASTING")
@@ -37,92 +38,95 @@ def generate_forecast_data(data, n_years):
 
 
 def forecast_display(state):
+    notify(state, 'i', 'Predicting...')
     state.forecast = generate_forecast_data(state.data, state.n_years)
+    notify(state, 's', 'Prediction done! Forecast data has been updated!')
 
 
-### Getting the data, make initial forcast and build a front end web-app with Taipy GUI
+
+#### Getting the data, make initial forcast and build a front end web-app with Taipy GUI
 data = get_stock_data(selected_stock, start_date, end_date)
 forecast = generate_forecast_data(data, n_years)
 
-show_part_1 = True
-show_part_2 = True
 show_dialog = False
 
-page = """
-<center><h1>Stock Price Analysis Dashboard with Taipy</h1></center>
+partial_md = "<|{forecast}|table|width=100%|>"
+dialog_md = "<|{show_dialog}|dialog|partial={partial}|title=Forecast Data|on_action={lambda state: state.assign('show_dialog', False)}|>"
 
-<|layout|columns=1 2 2|
+page = dialog_md + """<|toggle|theme|>
+<|container|
+# Stock Price **Analysis**{: .color-primary} Dashboard
 
-<|
-##Choose the period
-###FROM:   
+<|layout|columns=1 2 1|gap=40px|class_name=card p2|
+
+<dates|
+#### Selected **Period**{: .color-primary}
+
+From:
 <|{start_date}|date|>  
-###TO:   
-<|{end_date}|date|>  
-|>
 
-<|
-##Please enter a valid ticker:  
-<center>
-<|{selected_stock}|input|>  
-</center>
-##Popular tickers:
-<center>
-<|{selected_stock}|toggle|lov=MSFT;GOOG;AAPL; AMZN; META; COIN; GME; AMC;PYPL|>
-</center>
-|>
+To:
+<|{end_date}|date|> 
 
-<|
-##Select a prediction method
+<br/>
+<|Update period and ticker|button|on_action=get_data_from_range|>
+|dates>
+
+<ticker|
+#### Selected **Ticker**{: .color-primary}
+
+Please enter a valid ticker: 
+<|{selected_stock}|input|label=Stock|> 
+
+or choose a popular one
+
+<|{selected_stock}|toggle|lov=MSFT;GOOG;AAPL; AMZN; META; COIN; AMC; PYPL|>
+|ticker>
+
+<years|
+#### Prediction **years**{: .color-primary}
 Select number of prediction years: <|{n_years}|>  
 <|{n_years}|slider|min=1|max=5|>  
+
+<|PREDICT|button|on_action=forecast_display|>
+|years>
+
 |>
-|>
 
 
-<|ENTER|button|on_action=get_data_from_range|>  
-<|Show dialog|button|on_action={lambda state: state.assign("show_dialog", True)}|>
-
-
+<|Historical Data|expandable|expanded=False|
 <|layout|columns=1 1|
 <|
-<|part|render={show_part_1}|partial={partial_A}|>
-
+### Historical **closing**{: .color-primary} price
+<|{data}|chart|mode=line|x=Date|y[1]=Open|y[2]=Close|>
 |>
 
 <|
-<|PREDICT|button|on_action=forecast_display|>
-<|part|render={show_part_2}|partial={partial_B}|>
+### Historical **daily**{: .color-primary} trading volume
+<|{data}|chart|mode=line|x=Date|y=Volume||>
 |>
 |>
 
+### **Whole**{: .color-primary} historical data: <|{selected_stock}|>
+<|{data}|table|width=100%|>
 
-<|Historical Data|expandable|expanded=False|partial={partial_A}|>
-<|{show_dialog}|dialog|width=80%|partial={partial_A}|on_action={lambda state: state.assign("show_dialog", False)}|>
-<|FORECAST Data|expandable|expanded=False|partial={partial_B}|>
-"""
+<br/>
+|>
 
-p1 = """
-##Historical closing price
-<|{data}|chart|mode=line|x=Date|y[1]=Open|y[2]=Close|>
 
-##Historical daily trading volume
-<|{data}|chart|mode=line|x=Date|y=Volume|>
-
-##Here is the historical data of the stock: <|{selected_stock}|>
-<|{data}|table|width=80%|>
-"""
-
-p2 = """
-##FORECAST DATA 
+### **Forecast**{: .color-primary} Data
 <|{forecast}|chart|mode=line|x=ds|y[1]=yhat_lower|y[2]=yhat_upper|>
 
-<|{forecast}|table|width=80%|>
+<br/>
+
+
+<|More info|button|on_action={lambda s: s.assign("show_dialog", True)}|>
+{: .text-center}
+|>
 """
+
 
 # Run Taipy GUI
 gui = Gui(page)
-partial_A = gui.add_partial(p1)
-partial_B = gui.add_partial(p2)
-
-gui.run(dark_mode=False)
+partial = gui.add_partial(partial_md)
+gui.run(dark_mode=False, port=5005)
