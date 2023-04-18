@@ -32,7 +32,7 @@ def generate_forecast_data(data, n_years):
     m = Prophet()
     m.fit(df_train)
     future = m.make_future_dataframe(periods=n_years * 365)
-    fc = m.predict(future)[['ds', 'yhat_lower', 'yhat_upper']]
+    fc = m.predict(future)[['ds', 'yhat_lower', 'yhat_upper']].rename(columns={"ds": "Date", "yhat_lower": "Lower", "yhat_upper": "Upper"})
     print("Process Completed!")
     return fc
 
@@ -103,7 +103,7 @@ Select number of prediction years: <|{n_years}|>
 
 <|
 ### Historical **daily**{: .color-primary} trading volume
-<|{data}|chart|mode=line|x=Date|y=Volume||>
+<|{data}|chart|mode=line|x=Date|y=Volume|>
 |>
 |>
 
@@ -115,7 +115,7 @@ Select number of prediction years: <|{n_years}|>
 
 
 ### **Forecast**{: .color-primary} Data
-<|{forecast}|chart|mode=line|x=ds|y[1]=yhat_lower|y[2]=yhat_upper|>
+<|{forecast}|chart|mode=line|x=Date|y[1]=Lower|y[2]=Upper|>
 
 <br/>
 
@@ -123,10 +123,12 @@ Select number of prediction years: <|{n_years}|>
 <|More info|button|on_action={lambda s: s.assign("show_dialog", True)}|>
 {: .text-center}
 |>
+
+<br/>
 """
 
 
 # Run Taipy GUI
 gui = Gui(page)
 partial = gui.add_partial(partial_md)
-gui.run(dark_mode=False, port=5005)
+gui.run(dark_mode=False, title="Stock Visualization")
