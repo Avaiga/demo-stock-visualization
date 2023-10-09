@@ -2,6 +2,8 @@ from taipy.gui import Gui, notify
 from datetime import date
 import yfinance as yf
 from prophet import Prophet
+import pandas as pd
+
 
 # Parameters for retrieving the stock data
 start_date = "2015-01-01"
@@ -13,18 +15,25 @@ n_years = 1
 def get_stock_data(ticker, start, end):
     ticker_data = yf.download(ticker, start, end)  # downloading the stock data from START to TODAY
     ticker_data.reset_index(inplace=True)  # put date in the first column
-    ticker_data['Date'] = ticker_data['Date'].dt.tz_localize(None)
+    ticker_data['Date'] = pd.to_datetime(ticker_data['Date']).dt.tz_localize(None)
     return ticker_data
 
 def get_data_from_range(state):
     print("GENERATING HIST DATA")
-    print(state.start_date)
-    state.data = get_stock_data(state.selected_stock, state.start_date, state.end_date)
+    start_date = state.start_date if type(state.start_date)==str else state.start_date.strftime("%Y-%m-%d")
+    end_date = state.end_date if type(state.end_date)==str else state.end_date.strftime("%Y-%m-%d")
+
+    state.data = get_stock_data(state.selected_stock, start_date, end_date)
+    if len(state.data) == 0:
+        notify(state, "error", f"Not able to download data {state.selected_stock} from {start_date} to {end_date}")
+        return
     notify(state, 's', 'Historical data has been updated!')
+    notify(state, 'w', 'Deleting previous predictions...')
+    state.forecast = pd.DataFrame(columns=['Date', 'Lower', 'Upper'])
+
 
 
 def generate_forecast_data(data, n_years):
-    print("FORECASTING")
     # FORECASTING
     df_train = data[['Date', 'Close']]
     df_train = df_train.rename(columns={"Date": "ds", "Close": "y"})  # This is the format that Prophet accepts
@@ -50,7 +59,7 @@ forecast = generate_forecast_data(data, n_years)
 
 show_dialog = False
 
-partial_md = "<|{forecast}|table|width=100%|>"
+partial_md = "<|{forecast}|table|>"
 dialog_md = "<|{show_dialog}|dialog|partial={partial}|title=Forecast Data|on_action={lambda state: state.assign('show_dialog', False)}|>"
 
 page = dialog_md + """<|toggle|theme|>
@@ -63,24 +72,22 @@ page = dialog_md + """<|toggle|theme|>
 #### Selected **Period**{: .color-primary}
 
 From:
-<|{start_date}|date|>  
+<|{start_date}|date|on_change=get_data_from_range|>  
 
 To:
-<|{end_date}|date|> 
-
-<br/>
-<|Update period and ticker|button|on_action=get_data_from_range|>
+<|{end_date}|date|on_change=get_data_from_range|> 
 |dates>
 
 <ticker|
 #### Selected **Ticker**{: .color-primary}
 
 Please enter a valid ticker: 
-<|{selected_stock}|input|label=Stock|> 
+<|{selected_stock}|input|label=Stock|on_action=get_data_from_range|> 
+
 
 or choose a popular one
 
-<|{selected_stock}|toggle|lov=MSFT;GOOG;AAPL; AMZN; META; COIN; AMC; PYPL|>
+<|{selected_stock}|toggle|lov=MSFT;GOOG;AAPL; AMZN; META; COIN; AMC; PYPL|on_change=get_data_from_range|>
 |ticker>
 
 <years|
@@ -88,7 +95,7 @@ or choose a popular one
 Select number of prediction years: <|{n_years}|>  
 <|{n_years}|slider|min=1|max=5|>  
 
-<|PREDICT|button|on_action=forecast_display|>
+<|PREDICT|button|on_action=forecast_display|class_name={'plain' if len(forecast)==0 else ''}|>
 |years>
 
 |>
@@ -107,8 +114,8 @@ Select number of prediction years: <|{n_years}|>
 |>
 |>
 
-### **Whole**{: .color-primary} historical data: <|{selected_stock}|>
-<|{data}|table|width=100%|>
+### **Whole**{: .color-primary} historical data: <|{selected_stock}|text|raw|>
+<|{data}|table|>
 
 <br/>
 |>
