@@ -1,4 +1,4 @@
-taipy==2.2
+taipy==3.0.0.dev3
 yfinance==0.1.96
 holidays==0.24
 prophet==1.1.2
