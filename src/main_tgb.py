@@ -84,17 +84,17 @@ with tgb.Page() as page:
                 on_action="{lambda state: state.assign('show_dialog', False)}")
     
     with tgb.part("container"):
-        tgb.text("Stock Price Analysis Dashboard", class_name="h1 p1")
+        tgb.text("# Stock Price Analysis Dashboard", mode="md")
         with tgb.layout("1 2 1", gap="40px", class_name="card"):
             with tgb.part():
-                tgb.text("Selected Period", class_name="h4")
+                tgb.text("#### Selected Period", mode="md")
                 tgb.text("From:")
                 tgb.date("{start_date}", on_change=get_data_from_range)
                 tgb.html("br")
                 tgb.text("To:")
                 tgb.date("{end_date}", on_change=get_data_from_range)
             with tgb.part():
-                tgb.text("Selected Ticker", class_name="h4")
+                tgb.text("#### Selected Ticker", mode="md")
                 tgb.input(value="{selected_stock}", label="Stock", on_action=get_data_from_range)
                 tgb.html("br")
 
@@ -102,7 +102,7 @@ with tgb.Page() as page:
                 lov = ["MSFT", "GOOG", "AAPL", "AMZN", "META", "COIN", "AMC", "PYPL"]
                 tgb.toggle(value="{selected_stock}", lov=lov, on_change=get_data_from_range)
             with tgb.part():
-                tgb.text("Prediction years", class_name="h4")
+                tgb.text("#### Prediction years", mode="md")
                 tgb.text("Select number of prediction years: {n_years}")
                 tgb.html("br")
                 tgb.slider("{n_years}", min=1, max=5)
@@ -116,21 +116,17 @@ with tgb.Page() as page:
         with tgb.expandable(title="Historical Data", value="Historical Data", expanded=False):
             with tgb.layout("1 1"):
                 with tgb.part():
-                    tgb.text("Historical Closing price", class_name="h3")
+                    tgb.text("### Historical Closing price", mode="md")
                     tgb.chart("{data}", mode="line", x="Date", y__1="Open", y__2="Close")
 
                 with tgb.part():
-                    tgb.text("Historical Daily Trading Volume", class_name="h3")
+                    tgb.text("### Historical Daily Trading Volume", mode="md")
                     tgb.chart("{data}", mode="line", x="Date", y="Volume")
 
-            tgb.text("Whole Historical Data {selected_stock}", class_name="h3")
+            tgb.text("### Whole Historical Data {selected_stock}", mode="md")
             tgb.table("{data}")
 
-        tgb.html("br")
-
-        tgb.text("Forecast Data", class_name="h3")
-
-        tgb.html("br")
+        tgb.text("### Forecast Data", mode="md")
 
         with tgb.layout("1 1", class_name="text-center"):
             tgb.text("Pessimistic Forecast {int((forecast.loc[len(forecast)-1, 'Lower'] - forecast.loc[len(data), 'Lower'])/forecast.loc[len(data), 'Lower']*100)}%", class_name="h4 card", )
