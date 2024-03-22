@@ -79,13 +79,11 @@ class StockVisualization(Page):
                 tgb.text("#### Selected Period", mode="md")
                 tgb.text("From:")
                 tgb.date("{start_date}", on_change=self.get_data_range)
-                tgb.html("br")
                 tgb.text("To:")
                 tgb.date("{end_date}", on_change=self.get_data_range)
             with tgb.part():
                 tgb.text("#### Selected Ticker", mode="md")
                 tgb.input(value="{selected_stock}", label="Stock", on_action=self.get_data_range)
-                tgb.html("br")
 
                 tgb.text("or choose a popular one")
                 lov = ["MSFT", "GOOG", "AAPL", "AMZN", "META", "COIN", "AMC", "PYPL"]
@@ -93,7 +91,6 @@ class StockVisualization(Page):
             with tgb.part():
                 tgb.text("#### Prediction years", mode="md")
                 tgb.text("Select number of prediction years: {n_years}")
-                tgb.html("br")
                 tgb.slider("{n_years}", min=1, max=5)
 
                 tgb.button("Predict", on_action=self.forecast_display, class_name="{'plain' if len(forecast)==0 else ''}")
