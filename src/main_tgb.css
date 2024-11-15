@@ -1,0 +1,127 @@
+.css-179jfzq .sidebar{
+    height: auto;
+}
+
+/* Bold text are now in primary color */
+strong, b  {
+    font-weight: bold;
+    color : var(--color-primary);
+}
+
+.card p{
+    line-height: 5px;
+}
+
+/* Restrict width of page */
+.content{
+    margin-left: 2%;
+    margin-right: 2%;
+}
+
+/* Change behavior of sticky header */
+.header.sticky{
+    overflow:auto;
+    z-index: 2;
+}
+
+/* Change the width of the sticky header content */
+.header-content{
+    margin-left: 2%;
+    margin-right: 7%;
+}
+
+/* Change the color of the tabs */
+.header .MuiButtonBase-root.MuiTab-root{
+    border: 1px solid var(--color-primary); /* Thin line with 1px width, change color as needed */
+    border-radius: 25px; /* Adjust this value for more or less rounding */
+    padding: 10px; /* Optional: adds padding inside the rounded border */
+    margin: 10px;
+    text-transform: none;
+    width: 12%;
+}
+
+.header .MuiButtonBase-root.MuiTab-root.Mui-selected{
+    background-color: var(--color-primary);
+    color: white;
+}
+
+/* Hide "Mode" in theme toggle */
+.css-6fy833 p{
+    opacity: 0;
+}
+
+/* Change position of theme toggle */
+.css-6fy833 .MuiToggleButtonGroup-root{
+    top: 0.1rem !important;
+    right: 0.5rem ! important;
+    position: fixed;
+}
+
+/* Add margin to charts */
+.taipy-chart{
+    margin:5px;
+}
+
+/* Change all toggles */
+.taipy-toggle .MuiToggleButtonGroup-root{
+    height: 50px;
+}
+
+.taipy-toggle .Mui-selected{
+    background-color: var(--color-primary);
+    color:white;
+    height: 50px;
+}
+
+.taipy-toggle .Mui-selected .MuiTypography-root{
+    color:white !important;
+}
+
+/* Toggle Text */
+.taipy-toggle .MuiTypography-root{
+    color: var(--color-primary);
+}
+
+/* Toggle Text Selected */
+.taipy-toggle .Mui-selected .MuiTypography-root{
+    color: var(--color-primary);
+}
+
+.metric {
+    background-color : var(--color-primary);
+    color : white;
+}
+
+.taipy-date{
+    height:45px;
+    min-height: 40px;
+}
+
+.container .MuiButtonBase-root{
+    height:45px;
+    min-height: 40px;
+}
+
+.container .MuiInputBase-root{
+    height:45px;
+    min-height: 40px;
+}
+
+.metric {
+    margin:20px;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    border-radius: 12px;
+    box-shadow: 2px 2px 10px #ff61494b;
+}
+
+.taipy-slider{
+    height: 45px;
+    min-height: 40px;
+}
+
+/* Change h4 */
+
+h4, .h4{
+    line-height: 0.2;
+}

@@ -1,6 +1,6 @@
-numpy==1.24.2
-taipy==3.1
-yfinance==0.2.41
-holidays==0.24
-prophet==1.1.2
+numpy==1.26.4
+taipy==4.0.1
+yfinance==0.2.48
+holidays==0.59
+prophet==1.1.6
 plotly
