@@ -1,16 +1,9 @@
-.css-179jfzq .sidebar{
-    height: auto;
-}
-
 /* Bold text are now in primary color */
 strong, b  {
     font-weight: bold;
     color : var(--color-primary);
 }
 
-.card p{
-    line-height: 5px;
-}
 
 /* Restrict width of page */
 .content{
