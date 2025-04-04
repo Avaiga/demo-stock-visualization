@@ -4,16 +4,33 @@ import yfinance as yf
 from prophet import Prophet
 import pandas as pd
 import taipy.gui.builder as tgb
-
+from tools import round_columns_based_on_reference
 from plotly import graph_objects as go
 
 
-def get_stock_data(ticker, start, end):
+def get_stock_data(ticker: str, start: str, end: str) -> pd.DataFrame:
+    """Download and clean stock data, rounding prices based on value range."""
     ticker_data = yf.download(
-        ticker, start, end, multi_level_index=False
-    )  # downloading the stock data from START to TODAY
-    ticker_data.reset_index(inplace=True)  # put date in the first column
+        ticker,
+        start=start,
+        end=end,
+        multi_level_index=False,
+    )
+
+    if ticker_data.empty:
+        return pd.DataFrame()  # Handle invalid tickers or empty responses gracefully
+
+    ticker_data.reset_index(inplace=True)
     ticker_data["Date"] = pd.to_datetime(ticker_data["Date"]).dt.tz_localize(None)
+
+    ticker_data = round_columns_based_on_reference(
+        ticker_data, "Open", ["Open", "High", "Low", "Close"]
+    )
+
+    # Round volume to nearest integer
+    if "Volume" in ticker_data.columns:
+        ticker_data["Volume"] = ticker_data["Volume"].round(0).astype("Int64")
+
     return ticker_data
 
 
@@ -74,7 +91,8 @@ def generate_forecast_data(data, n_years):
     fc = m.predict(future)[["ds", "yhat_lower", "yhat_upper"]].rename(
         columns={"ds": "Date", "yhat_lower": "Lower", "yhat_upper": "Upper"}
     )
-    print("Process Completed!")
+
+    fc = round_columns_based_on_reference(fc, "Lower", ["Lower", "Upper"])
     return fc
 
 
