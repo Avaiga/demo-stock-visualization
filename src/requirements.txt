@@ -3,3 +3,4 @@ taipy==4.0.1
 yfinance==0.2.54
 holidays==0.59
 plotly
+prophet==1.1.6
