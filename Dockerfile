@@ -9,12 +9,12 @@
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 
-FROM python:3.11
+FROM python:3.11-slim
 
 WORKDIR /app
 
 # Install application dependencies.
-COPY src/requirements.txt .
+COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 # Copy the application source code.

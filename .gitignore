@@ -1,3 +1,8 @@
 
 *.pyc
 src.zip
+/src/.taipy
+/src/.vscode
+/src/user_data
+/src/.vscode
+*.gz

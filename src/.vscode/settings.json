@@ -1,3 +1,4 @@
 {
-    "taipyStudio.gUI.elementsFilePaths": []
+    "taipyStudio.gUI.elementsFilePaths": [],
+    "taipyStudio.config.mainPythonFile": "main_tgb_class.py"
 }

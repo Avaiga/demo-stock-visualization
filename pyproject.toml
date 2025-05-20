@@ -1,5 +1,5 @@
 [project]
-name = "src"
+name = "demo-stock-visualization"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -9,6 +9,7 @@ dependencies = [
     "numpy==1.26.4",
     "plotly>=6.0.1",
     "prophet==1.1.6",
-    "taipy==4.0.1",
+    "pydantic>=2.11.3",
+    "taipy==4.0.3",
     "yfinance==0.2.54",
 ]
